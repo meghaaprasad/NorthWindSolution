@@ -18,7 +18,7 @@ namespace NorthWindAPI
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            WebHost.CreateDefaultBuilder(args).ConfigureLogging(options => options.AddConsole())
                 .UseStartup<Startup>();
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NorthWindAPI;
 using NorthWindAPI.Model;
 
@@ -15,16 +16,19 @@ namespace NorthWindAPI.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly NorthWindDBContext _context;
+        private readonly ILogger<EmployeesController> _logger;
 
-        public EmployeesController(NorthWindDBContext context)
+        public EmployeesController(NorthWindDBContext context, ILogger<EmployeesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Employees
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
+            _logger.LogInformation("Fetching All Employees");
             return await _context.Employees.ToListAsync();
         }
 
@@ -32,6 +36,7 @@ namespace NorthWindAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(int id)
         {
+            _logger.LogInformation("Fetching  Employee "+id);
             var employee = await _context.Employees.FindAsync(id);
 
             if (employee == null)
@@ -46,6 +51,7 @@ namespace NorthWindAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, Employee employee)
         {
+            _logger.LogInformation("Updating  Employee " + id);
             if (id != employee.EmployeeID)
             {
                 return BadRequest();
@@ -76,9 +82,10 @@ namespace NorthWindAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
+            _logger.LogInformation("Adding new  Employee ");
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
-
+            _logger.LogInformation("Added new  Employee "+employee.EmployeeID);
             return CreatedAtAction("GetEmployee", new { id = employee.EmployeeID }, employee);
         }
 
@@ -91,7 +98,7 @@ namespace NorthWindAPI.Controllers
             {
                 return NotFound();
             }
-
+            _logger.LogInformation("Removing  Employee " + id);
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
 
